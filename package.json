@@ -1,0 +1,15 @@
+{
+  "name": "police-app-backend",
+  "version": "0.0.1",
+  "description": "~~~",
+  "main": "index.js",
+  "author": "Jonathan Frere",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "knex": "^0.13.0",
+    "objection": "^0.8.9",
+    "sqlite3": "^3.1.13"
+  },
+  "devDependencies": {}
+}
