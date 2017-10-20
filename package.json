@@ -7,6 +7,8 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
+    "boom": "^6.0.0",
+    "hapi": "^16.6.2",
     "knex": "^0.13.0",
     "objection": "^0.8.9",
     "sqlite3": "^3.1.13"
