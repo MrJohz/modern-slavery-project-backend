@@ -17,7 +17,7 @@ module.exports.UserKnexStore = class UserKnexStore {
         }
 
         const user = userWithGroups[0];
-        user.memberOf = userWithGroups.map(user => user.group);
+        user.memberOf = userWithGroups.filter(user => user.group != null).map(user => user.group);
         user.administrates = userWithGroups.filter(user => user.group_admin).map(user => user.group);
 
         return new User(user);
