@@ -18,12 +18,5 @@ module.exports.route = ({ userStore }) => {
         reply(await userStore.getAllUsers());
     };
 
-    const update = (request, reply) => {
-        reply([
-            { id: 13, name: 'Kevin', email: 'kevin@kevin.kevin', systemAdmin: false },
-            { id: 53, name: 'admin', email: 'admin@admin.admin', systemAdmin: true },
-        ])
-    };
-
-    return { fetchOne, fetchAll, update };
+    return { fetchOne, fetchAll };
 };
