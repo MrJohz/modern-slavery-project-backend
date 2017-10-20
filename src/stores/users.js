@@ -10,6 +10,10 @@ module.exports.UserKnexStore = class UserKnexStore {
             .where({ id })
             .first();
 
+        if (!user) {
+            return null;  // cannot find user
+        }
+
         return new User(user);
     }
 

@@ -1,21 +1,21 @@
 const { badRequest, notFound } = require('boom');
 
-module.exports.route = ({ userStore }) => {
+module.exports.route = ({ groupStore }) => {
 
     const fetchOne = async (request, reply) => {
         if (!/^\d+$/.test(request.params.id)) {
             return reply(badRequest(`could not coerce '${request.params.id}' to int`));
         }
 
-        const user = await userStore.getUserById(parseInt(request.params.id, 10));
+        const group = await groupStore.getGroupById(parseInt(request.params.id, 10));
 
-        return user
-            ? reply(user)
-            : reply(notFound(`could not find user with id ${request.params.id}`));
+        return group
+            ? reply(group)
+            : reply(notFound(`could not find group with id ${request.params.id}`));
     };
 
     const fetchAll = async (request, reply) => {
-        reply(await userStore.getAllUsers());
+        reply(await groupStore.getAllGroups());
     };
 
     const update = (request, reply) => {
