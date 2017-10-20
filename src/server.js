@@ -36,6 +36,18 @@ server.register({
     throw err;
 });
 
+if (DEBUG) {
+    server.register({
+        register: require('./plugins/knex-logger'),
+        options: knex
+    }, err => {
+        if (!err) return;
+
+        console.error('Failed to load knex logger:', err);
+        throw err;
+    });
+}
+
 server.register({
     register: require('./plugins/routing'),
     options: {

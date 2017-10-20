@@ -5,8 +5,9 @@ module.exports.User = class User {
         this.id = required(user, 'id');
         this.name = required(user, 'name');
         this.email = required(user, 'email');
-        this._site_admin = !!required(user, 'site_admin');  // cast to boolean, some stores won't do this by default
-        this._password = user.password;
+        this.site_admin = !!required(user, 'site_admin');  // cast to boolean, some stores won't do this by default
+        this.administrates = required(user, 'administrates');
+        this.memberOf = required(user, 'memberOf');
     }
 
     toJSON() {
@@ -14,7 +15,9 @@ module.exports.User = class User {
             id: this.id,
             name: this.name,
             email: this.email,
-            site_admin: this._site_admin
+            site_admin: this.site_admin,
+            administrates: this.administrates,
+            memberOf: this.memberOf,
         };
     }
 };

@@ -1,1 +1,3 @@
-exports.DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV.toLowerCase() === 'debug';
+exports.env = (process.env.NODE_ENV || 'development').toLowerCase();
+
+exports.DEBUG = exports.env === 'development';

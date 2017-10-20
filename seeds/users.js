@@ -52,7 +52,14 @@ const USERS = [
         id: 8,
         name: '孫德明',
         email: 'erufwa@mac.com',
-        password: '4d2d05cdcfecba50d394dccf16f463b9bd241ecbdc176e794caedc44d64a910b',
+        password: 'e7bd05cdcfecba50d394dccf16f463b9bd241ecbdc176e794caedc44d64a910b',
+        site_admin: false
+    },
+    {
+        id: 9,
+        name: 'Lucy Loner',
+        email: 'lucl@ukas.com',
+        password: '3f6d05cdcfecba50d394dccf16f469b9ddb41ecbdc176e794caedc44d64a910b',
         site_admin: false
     },
 ];
@@ -117,7 +124,7 @@ exports.seed = async function (knex) {
             user: knex('users').where({ name: 'admin' }).select('id').first(),
             group: northEastHospital,
             group_admin: false,
-        }
+        },
     ]);
 
     await knex('group_users').insert([
@@ -150,6 +157,6 @@ exports.seed = async function (knex) {
             user: knex('users').where({ name: 'Yusinda Force' }).select('id').first(),
             group: gmpFrontline,
             group_admin: false,
-        }
+        },
     ]);
 };
