@@ -1,9 +1,11 @@
 const hapi = require('hapi');
 
 const { DEBUG } = require('./environment');
-const { knex } = require('./knex');
+const { create } = require('./knex');
 const { UserKnexStore } = require('./stores/users');
 const { GroupKnexStore } = require('./stores/groups');
+
+const knex = create();
 
 const server = new hapi.Server();
 server.connection({

@@ -77,7 +77,6 @@ exports.seed = async function (knex) {
     await knex('group_users').delete();
 
     for (const user of USERS) {
-        console.log(user.name);
         await knex('users').insert(user);
     }
 

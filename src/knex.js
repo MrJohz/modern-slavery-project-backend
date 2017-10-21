@@ -1,3 +1,4 @@
 const { env } = require('./environment');
 
-module.exports.knex = require('knex')(require('../knexfile')[env]);
+module.exports.create = (forceEnv) =>
+    require('knex')(require('../knexfile')[forceEnv || env]);
