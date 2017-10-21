@@ -56,7 +56,9 @@ module.exports.UserKnexStore = class UserKnexStore {
             }
         }
 
-        users.push(new User(aggregatedUser));  // last user won't have been added yet
+        if (aggregatedUser != null) {
+            users.push(new User(aggregatedUser));  // last user won't have been added yet
+        }
 
         return users;
     }
