@@ -5,7 +5,7 @@ const { User } = require("../../../../src/models/users");
 
 const { UserKnexStore } = require('../../../../src/stores/users');
 
-describe('UserKnexStore', () => {
+describe('stores/user', () => {
 
     let knexFixture;
     let knexTracker;

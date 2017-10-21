@@ -94,6 +94,12 @@ exports.seed = async function (knex) {
         description: 'Frontline officers for Greater Manchester Police',
     }))[0];
 
+    await knex('groups').insert({
+        id: 3,
+        name: 'Charities MDS Coalition',
+        description: 'Consortium of users from charities',
+    });
+
     await knex('group_users').insert([
         {
             user: knex('users').where({ name: 'Jonas' }).select('id').first(),

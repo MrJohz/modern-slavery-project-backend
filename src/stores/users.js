@@ -5,9 +5,9 @@ module.exports.UserKnexStore = class UserKnexStore {
         this.knex = knex;
     }
 
-    async getUserById(id) {
+    async getUserById(userId) {
         const userWithGroups = await this.knex('users')
-            .where({ id: id })
+            .where({ id: userId })
             .leftJoin('group_users', 'users.id', '=', 'group_users.user')
             .select('users.id', 'users.name', 'users.email', 'users.site_admin',
                 'group_users.group', 'group_users.group_admin');
