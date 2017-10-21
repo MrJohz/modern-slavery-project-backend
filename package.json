@@ -7,7 +7,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "test": "mocha 'tests/**/*.spec.js'"
+    "test": "cross-env NODE_ENV=test mocha 'tests/**/*.spec.js'"
   },
   "dependencies": {
     "boom": "^6.0.0",
