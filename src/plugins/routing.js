@@ -11,7 +11,10 @@ exports.register = function Router(server, options, next) {
             server.route({
                 method: 'GET',
                 path: `${mount}/{id}`,
-                handler: handlers['fetchOne']
+                config: {
+                    response: { emptyStatusCode: 204 },
+                    handler: handlers['fetchOne'],
+                }
             });
         }
 
@@ -19,7 +22,10 @@ exports.register = function Router(server, options, next) {
             server.route({
                 method: 'GET',
                 path: mount ? `${mount}` : '/',  // special case for mount point being '/'
-                handler: handlers['fetchAll']
+                config: {
+                    response: { emptyStatusCode: 204 },
+                    handler: handlers['fetchAll'],
+                }
             });
         }
 
@@ -27,7 +33,10 @@ exports.register = function Router(server, options, next) {
             server.route({
                 method: 'POST',
                 path: mount ? `${mount}` : '/',  // special case for mount point being '/'
-                handler: handlers['create']
+                config: {
+                    response: { emptyStatusCode: 204 },
+                    handler: handlers['create'],
+                }
             });
         }
 
@@ -35,7 +44,10 @@ exports.register = function Router(server, options, next) {
             server.route({
                 method: 'DELETE',
                 path: `${mount}/{id}`,
-                handler: handlers['remove']
+                config: {
+                    response: { emptyStatusCode: 204 },
+                    handler: handlers['remove'],
+                }
             });
         }
 
@@ -43,7 +55,10 @@ exports.register = function Router(server, options, next) {
             server.route({
                 method: 'PATCH',
                 path: `${mount}/{id}`,
-                handler: handlers['update']
+                config: {
+                    response: { emptyStatusCode: 204 },
+                    handler: handlers['update'],
+                }
             });
         }
     }

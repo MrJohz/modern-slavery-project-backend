@@ -45,7 +45,10 @@ describe('plugins/routing', () => {
                 demand(serverStub.route.getCall(0).args).to.eql([{
                     method: 'GET',
                     path: `${expected}/{id}`,
-                    handler: fetchOneSpy
+                    config: {
+                        response: { emptyStatusCode: 204 },
+                        handler: fetchOneSpy,
+                    }
                 }]);
             });
         }
@@ -79,7 +82,10 @@ describe('plugins/routing', () => {
                 demand(serverStub.route.getCall(0).args).to.eql([{
                     method: 'GET',
                     path: `${expected}`,
-                    handler: fetchAllSpy
+                    config: {
+                        response: { emptyStatusCode: 204 },
+                        handler: fetchAllSpy,
+                    }
                 }]);
             });
         }
@@ -113,7 +119,10 @@ describe('plugins/routing', () => {
                 demand(serverStub.route.getCall(0).args).to.eql([{
                     method: 'POST',
                     path: `${expected}`,
-                    handler: createSpy
+                    config: {
+                        response: { emptyStatusCode: 204 },
+                        handler: createSpy,
+                    }
                 }]);
             });
         }
@@ -147,7 +156,10 @@ describe('plugins/routing', () => {
                 demand(serverStub.route.getCall(0).args).to.eql([{
                     method: 'DELETE',
                     path: `${expected}/{id}`,
-                    handler: removeSpy
+                    config: {
+                        response: { emptyStatusCode: 204 },
+                        handler: removeSpy,
+                    }
                 }]);
             });
         }
@@ -181,7 +193,10 @@ describe('plugins/routing', () => {
                 demand(serverStub.route.getCall(0).args).to.eql([{
                     method: 'PATCH',
                     path: `${expected}/{id}`,
-                    handler: updateSpy
+                    config: {
+                        response: { emptyStatusCode: 204 },
+                        handler: updateSpy,
+                    }
                 }]);
             });
         }
@@ -193,11 +208,11 @@ describe('plugins/routing', () => {
         ];
         for (const { provided, expectWithId, expectWithoutId } of mountPoints) {
 
-            const fetchOneSpy = {withId: true, method: 'GET'};
-            const fetchAllSpy = {withId: false, method: 'GET'};
-            const createSpy = {withId: false, method: 'POST'};
-            const removeSpy = {withId: true, method: 'DELETE'};
-            const updateSpy = {withId: true, method: 'PATCH'};
+            const fetchOneSpy = { withId: true, method: 'GET' };
+            const fetchAllSpy = { withId: false, method: 'GET' };
+            const createSpy = { withId: false, method: 'POST' };
+            const removeSpy = { withId: true, method: 'DELETE' };
+            const updateSpy = { withId: true, method: 'PATCH' };
 
             const methods = [
                 { fetchOne: fetchOneSpy },
@@ -231,7 +246,10 @@ describe('plugins/routing', () => {
                         demand(serverStub.route.calledWith({
                             method: routes[key].method,
                             path: routes[key].withId ? expectWithId : expectWithoutId,
-                            handler: routes[key]
+                            config: {
+                                response: { emptyStatusCode: 204 },
+                                handler: routes[key],
+                            },
                         })).to.be.true();
                     }
                 })

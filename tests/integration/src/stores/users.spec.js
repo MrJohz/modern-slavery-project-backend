@@ -252,6 +252,26 @@ describe('stores/users', () => {
 
         });
 
+        describe('deleteUser', () => {
+
+            it(`should return true if the user exist(ed)`, async () => {
+                await knex('users').insert({
+                    id: 1,
+                    name: 'delete-me',
+                    email: 'test@test.com',
+                    password: 'test',
+                    site_admin: false
+                });
+
+                demand(await store.deleteUserById(1)).to.be.true();
+            });
+
+            it(`should return false if the user did not exist`, async () => {
+                demand(await store.deleteUserById(1)).to.be.false();
+            });
+
+        })
+
     });
 
 });

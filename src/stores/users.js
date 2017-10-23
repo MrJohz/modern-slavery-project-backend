@@ -6,6 +6,7 @@ const { hash } = require('bcrypt');
 const { security } = require('../environment');
 
 exports.UserExistsError = class UserExistsError extends ExtendableError {};
+exports.UserNotFoundError = class UserNotFoundError extends ExtendableError {};
 
 exports.UserKnexStore = class UserKnexStore {
     constructor(knex) {
@@ -97,6 +98,14 @@ exports.UserKnexStore = class UserKnexStore {
                 id: id[0], memberOf: [], administrates: [],
             }));
         });
+    }
+
+    async deleteUserById(userId) {
+        const rows = await this._knex('users')
+            .where('id', userId)
+            .delete();
+
+        return rows > 0;  // return true if a user was actually deleted
     }
 
 };
