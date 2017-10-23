@@ -13,8 +13,17 @@ exports.UserKnexStore = class UserKnexStore {
         this._knex = knex;
     }
 
-    async getUserById(userId) {
-        const userWithGroups = await this._knex('users')
+    _getTableWithTransaction(tableName, maybeTrx) {
+        const table = this._knex(tableName);
+        if (maybeTrx) {
+            table.transacting(maybeTrx);
+        }
+
+        return table;
+    }
+
+    async getUserById(userId, _trx) {
+        const userWithGroups = await this._getTableWithTransaction('users', _trx)
             .where({ id: userId })
             .leftJoin('group_users', 'users.id', '=', 'group_users.user')
             .select('users.id', 'users.name', 'users.email', 'users.site_admin',
@@ -31,8 +40,8 @@ exports.UserKnexStore = class UserKnexStore {
         return new User(user);
     }
 
-    async getAllUsers() {
-        const userQuery = await this._knex('users')
+    async getAllUsers(_trx) {
+        const userQuery = await this._getTableWithTransaction('users', _trx)
             .leftJoin('group_users', 'users.id', '=', 'group_users.user')
             .select('users.id', 'users.name', 'users.email', 'users.site_admin',
                 'group_users.group', 'group_users.group_admin')
@@ -71,7 +80,7 @@ exports.UserKnexStore = class UserKnexStore {
         return users;
     }
 
-    async createUser(user) {
+    async createUser(user, _trx) {
         const userToInsert = {
             name: required(user, 'name'),
             email: required(user, 'email'),
@@ -79,10 +88,10 @@ exports.UserKnexStore = class UserKnexStore {
             site_admin: false,
         };
 
-        return await this._knex.transaction(async trx => {
+        const operation = async trx => {
             const existingUsers = await this._knex('users')
                 .transacting(trx)
-                .where({ email: userToInsert.email })
+                .where('email', userToInsert.email)
                 .count('* as count')
                 .first();
 
@@ -97,15 +106,45 @@ exports.UserKnexStore = class UserKnexStore {
             return new User(Object.assign(userToInsert, {
                 id: id[0], memberOf: [], administrates: [],
             }));
-        });
+        };
+
+        if (_trx) {  // are we part of an existing transaction?  if so let's not open a new one
+            return await operation(_trx);
+        } else {  // no we're not, well we need one anyway
+            return await this._knex.transaction(operation)
+        }
     }
 
-    async deleteUserById(userId) {
-        const rows = await this._knex('users')
+    async deleteUserById(userId, _trx) {
+        const rows = await this._getTableWithTransaction('users', _trx)
             .where('id', userId)
             .delete();
 
         return rows > 0;  // return true if a user was actually deleted
+    }
+
+    async updateUserById(userId, updater, _trx) {
+        // TODO: huh, this is harder than I thought it would be - let's sleep on it!
+
+        const operation = async trx => {
+            const originalUser = await this.getUserById(userId, trx);
+
+            // updater doesn't have to be async to work here, but it helps
+            // so await it anyway.  we're in an async function, it's
+            // basically free to do that (not a technically true statement)
+            const newUser = await updater(originalUser);
+
+            await this._knex('users')
+                .transacting(trx)
+                .where('id', userId)
+                .update(/* but how? */)
+        };
+
+        if (_trx) {  // are we part of an existing transaction?  if so let's not open a new one
+            return await operation(_trx);
+        } else {  // no we're not, well we need one anyway
+            return await this._knex.transaction(operation)
+        }
     }
 
 };
