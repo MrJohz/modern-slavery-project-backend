@@ -1,4 +1,8 @@
 const { User } = require('../models/users');
+const { required } = require('../models/utils');
+const { hash } = require('bcrypt');
+
+const { security } = require('../environment');
 
 module.exports.UserKnexStore = class UserKnexStore {
     constructor(knex) {
@@ -62,4 +66,20 @@ module.exports.UserKnexStore = class UserKnexStore {
 
         return users;
     }
+
+    async createUser(user) {
+        const userToInsert = {
+            name: required(user, 'name'),
+            email: required(user, 'email'),
+            password: await hash(required(user, 'password'), security.saltRounds),
+            site_admin: false,
+        };
+
+        const id = (await this.knex('users').insert(userToInsert))[0];
+
+        return new User(Object.assign(userToInsert, {
+            id, memberOf: [], administrates: [],
+        }));
+    }
+
 };

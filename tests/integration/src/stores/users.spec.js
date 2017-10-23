@@ -1,6 +1,8 @@
 const demand = require('must');
 require('../../../utils/must-user')(demand);
 
+const { compare } = require('bcrypt');
+
 const { UserKnexStore } = require('../../../../src/stores/users');
 const { create } = require('../../../../src/knex');
 
@@ -183,6 +185,54 @@ describe('stores/users', () => {
                         administrates: [await getIdForGroup('North East Hospital')],
                     },
                 );
+            });
+
+        });
+
+        describe('createUser', () => {
+
+            it('should fail if not all parameters are passed in', async () => {
+                await demand(store.createUser({})).to.reject.to.error(Error);
+
+                await demand(store.createUser({
+                    name: 'test-user'
+                })).to.reject.to.error(Error);
+
+                await demand(store.createUser({
+                    name: 'test-user',
+                    email: 'test@test.test'
+                })).to.reject.to.error(Error);
+
+                await demand(store.createUser({
+                    email: 'test@test.test',
+                    password: `my mother's maiden name is...`
+                })).to.reject.to.error(Error);
+            });
+
+            it('should create a new user with a hashed password, no admin rights, and no groups', async () => {
+                const password = `my mother's maiden name is...`;
+
+                const user = await store.createUser({
+                    name: 'admin',
+                    email: 'test@test.com',
+                    password: password,
+                });
+
+                const id = (await knex('users').select('id').where({name: 'admin'}).first()).id;
+
+                demand(user).to.be.User({
+                    id,
+                    name: 'admin',
+                    email: 'test@test.com',
+                    site_admin: false,
+                    memberOf: [],
+                    administrates: [],
+                });
+
+                demand(user).to.be.User(await store.getUserById(id));
+
+                const hashedPass = (await knex('users').select('password').where({name: 'admin'}).first()).password;
+                demand(await compare(password, hashedPass)).to.be.true();
             });
 
         });
