@@ -1,5 +1,6 @@
 const demand = require('must');
 const sinon = require('sinon');
+const { UserExistsError } = require("../../../../src/stores/users");
 const { badRequest, notFound } = require('boom');
 
 const { route: userRoutes } = require('../../../../src/routes/users');
@@ -100,6 +101,114 @@ describe('routes/users', () => {
             demand(dummyUserStore.getAllUsers.getCall(0).args).eql([]);
 
         });
+
     });
+
+    describe('create', () => {
+
+        let reply;
+        beforeEach(() => {
+            reply = sinon.spy();
+        });
+
+        it(`should return an error if payload does not exist`, async () => {
+            const dummyUserStore = {};
+            const request = { payload: null };
+
+            const { create } = userRoutes({ userStore: dummyUserStore });
+            await create(request, reply);
+
+            demand(reply.callCount).equal(1);
+
+            const replyErr = reply.getCall(0).args[0];
+            demand(replyErr.isBoom).to.be.true();
+            demand(replyErr.output.statusCode).to.equal(400);
+            demand(replyErr.message).to.equal('invalid payload sent');
+            demand(replyErr.data.validationErrors).to.eql([
+                'key not found: name',
+                'key not found: email',
+                'key not found: password',
+            ]);
+        });
+
+        it(`should return an error if payload does not contain the correct keys`, async () => {
+            const dummyUserStore = {};
+            const request = {
+                payload: { password: 'test' }
+            };
+
+            const { create } = userRoutes({ userStore: dummyUserStore });
+            await create(request, reply);
+
+            demand(reply.callCount).equal(1);
+
+            const replyErr = reply.getCall(0).args[0];
+            demand(replyErr.isBoom).to.be.true();
+            demand(replyErr.output.statusCode).to.equal(400);
+            demand(replyErr.message).to.equal('invalid payload sent');
+            demand(replyErr.data.validationErrors).to.eql([
+                'key not found: name',
+                'key not found: email',
+            ]);
+        });
+
+        it(`should return an error if email address is already in use`, async () => {
+            const dummyUserStore = {
+                createUser: sinon.stub().returns(Promise.reject(new UserExistsError('email already in use')))
+            };
+
+            const request = {
+                payload: {
+                    name: 'kevin',
+                    email: 'test@test.test',
+                    password: 'test',
+                }
+            };
+
+            const { create } = userRoutes({ userStore: dummyUserStore });
+            await create(request, reply);
+
+            demand(reply.callCount).equal(1);
+
+            const replyErr = reply.getCall(0).args[0];
+            demand(replyErr.isBoom).to.be.true();
+            demand(replyErr.output.statusCode).to.equal(400);
+            demand(replyErr.message).to.equal('invalid payload sent');
+            demand(replyErr.data.validationErrors).to.eql([
+                'email already in use',
+            ]);
+
+            demand(dummyUserStore.createUser.callCount).equal(1);
+            demand(dummyUserStore.createUser.getCall(0).args).eql([request.payload]);
+        });
+
+        it(`should return the user if the user can be successfully created`, async () => {
+            const expectedUser = {
+                name: 'test'
+            };
+
+            const dummyUserStore = {
+                createUser: sinon.stub().returns(Promise.resolve(expectedUser))
+            };
+
+            const request = {
+                payload: {
+                    name: 'kevin',
+                    email: 'test@test.test',
+                    password: 'test',
+                }
+            };
+
+            const { create } = userRoutes({ userStore: dummyUserStore });
+            await create(request, reply);
+
+            demand(reply.callCount).equal(1);
+            demand(reply.getCall(0).args).eql([expectedUser]);
+
+            demand(dummyUserStore.createUser.callCount).equal(1);
+            demand(dummyUserStore.createUser.getCall(0).args).eql([request.payload]);
+        });
+
+    })
 
 });

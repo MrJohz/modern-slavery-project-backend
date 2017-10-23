@@ -3,7 +3,7 @@ require('../../../utils/must-user')(demand);
 
 const { compare } = require('bcrypt');
 
-const { UserKnexStore } = require('../../../../src/stores/users');
+const { UserKnexStore, UserExistsError } = require('../../../../src/stores/users');
 const { create } = require('../../../../src/knex');
 
 describe('stores/users', () => {
@@ -233,6 +233,21 @@ describe('stores/users', () => {
 
                 const hashedPass = (await knex('users').select('password').where({name: 'admin'}).first()).password;
                 demand(await compare(password, hashedPass)).to.be.true();
+            });
+
+            it(`should throw an error if the user's email already exists`, async () => {
+                await knex('users').insert({
+                    name: 'original',
+                    email: 'test@test.com',
+                    password: 'test',
+                    site_admin: false
+                });
+
+                await demand(store.createUser({
+                    name: 'added',
+                    email: 'test@test.com',
+                    password: `my mother's maiden name is...`,
+                })).to.reject.to.error(UserExistsError, /email/);
             });
 
         });

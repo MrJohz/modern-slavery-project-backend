@@ -1,16 +1,19 @@
+const { ExtendableError } = require("../models/errors");
 const { User } = require('../models/users');
 const { required } = require('../models/utils');
 const { hash } = require('bcrypt');
 
 const { security } = require('../environment');
 
-module.exports.UserKnexStore = class UserKnexStore {
+exports.UserExistsError = class UserExistsError extends ExtendableError {};
+
+exports.UserKnexStore = class UserKnexStore {
     constructor(knex) {
-        this.knex = knex;
+        this._knex = knex;
     }
 
     async getUserById(userId) {
-        const userWithGroups = await this.knex('users')
+        const userWithGroups = await this._knex('users')
             .where({ id: userId })
             .leftJoin('group_users', 'users.id', '=', 'group_users.user')
             .select('users.id', 'users.name', 'users.email', 'users.site_admin',
@@ -28,7 +31,7 @@ module.exports.UserKnexStore = class UserKnexStore {
     }
 
     async getAllUsers() {
-        const userQuery = await this.knex('users')
+        const userQuery = await this._knex('users')
             .leftJoin('group_users', 'users.id', '=', 'group_users.user')
             .select('users.id', 'users.name', 'users.email', 'users.site_admin',
                 'group_users.group', 'group_users.group_admin')
@@ -75,11 +78,25 @@ module.exports.UserKnexStore = class UserKnexStore {
             site_admin: false,
         };
 
-        const id = (await this.knex('users').insert(userToInsert))[0];
+        return await this._knex.transaction(async trx => {
+            const existingUsers = await this._knex('users')
+                .transacting(trx)
+                .where({ email: userToInsert.email })
+                .count('* as count')
+                .first();
 
-        return new User(Object.assign(userToInsert, {
-            id, memberOf: [], administrates: [],
-        }));
+            if (existingUsers.count > 0) {
+                throw new exports.UserExistsError(`email already in use`);
+            }
+
+            const id = await this._knex('users')
+                .transacting(trx)
+                .insert(userToInsert);
+
+            return new User(Object.assign(userToInsert, {
+                id: id[0], memberOf: [], administrates: [],
+            }));
+        });
     }
 
 };
