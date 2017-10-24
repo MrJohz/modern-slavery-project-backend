@@ -74,5 +74,53 @@ module.exports.route = ({ userStore }) => {
             : reply(notFound(`could not find user with id ${request.params.id}`));
     };
 
-    return { fetchOne, fetchAll, create, remove };
+    const update = async (request, reply) => {
+        if (!/^\d+$/.test(request.params.id)) {
+            return reply(badRequest(`could not coerce '${request.params.id}' to int`));
+        }
+
+        if (!request.payload) {
+            // if no payload is sent, payload is null
+            // set it to an empty object instead - it makes for easier validation down the line
+            request.payload = {};
+        }
+
+        const validationErrors = [];
+
+        for (const key of Object.keys(request.payload)) {
+            if (!['name', 'email', 'site_admin', 'password'].includes(key)) {
+                validationErrors.push(`attribute '${key}' is not updatable by this method`);
+            }
+        }
+
+        if (validationErrors.length) {
+            const err = badRequest(`invalid payload sent`, { validationErrors });
+            err.reformat();  // boom is weird - https://github.com/hapijs/hapi/blob/master/API.md#error-transformation
+            err.output.payload.validationErrors = validationErrors;
+            return reply(err);
+        }
+
+        let user;
+        try {
+            user = await userStore.updateUserById(parseInt(request.params.id, 10), request.payload);
+        } catch (e) {
+            if (e instanceof EmailExistsError) {
+                validationErrors.push(`email already in use`);
+            } else {
+                throw e;
+            }
+        }
+
+        if (validationErrors.length) {
+            const err = badRequest(`invalid payload sent`, { validationErrors });
+            err.reformat();  // boom is weird - https://github.com/hapijs/hapi/blob/master/API.md#error-transformation
+            err.output.payload.validationErrors = validationErrors;
+            return reply(err);
+        }
+
+        return reply(user);
+
+    };
+
+    return { fetchOne, fetchAll, create, remove, update };
 };

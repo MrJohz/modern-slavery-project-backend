@@ -276,4 +276,121 @@ describe('routes/users', () => {
 
     });
 
+    describe('update', () => {
+
+        let reply;
+        beforeEach(() => {
+            reply = sinon.spy();
+        });
+
+        for (const param of ['000uiop', 'qwer0000', 'asdf']) {
+            it(`should fail if the id parameter is not an integer (${param})`, async () => {
+                const request = {
+                    params: { id: param }
+                };
+
+                const dummyUserStore = {};
+                const { update } = userRoutes({ userStore: dummyUserStore });
+
+                await update(request, reply);
+
+                demand(reply.callCount).equal(1);
+                demand(reply.getCall(0).args).eql([badRequest(`could not coerce '${request.params.id}' to int`)])
+            });
+        }
+
+        it(`should return unchanged user if payload does not exist`, async () => {
+            const sampleUser = {};
+
+            const dummyUserStore = {
+                updateUserById: sinon.stub().returns(Promise.resolve(sampleUser))
+            };
+
+            const request = {
+                params: { id: '1'},
+                payload: null
+            };
+
+            const { update } = userRoutes({ userStore: dummyUserStore });
+            await update(request, reply);
+
+            demand(reply.callCount).equal(1);
+            demand(reply.getCall(0).args).to.eql([sampleUser]);
+        });
+
+        it(`should return an error if payload contains an incorrect key`, async () => {
+            const dummyUserStore = {};
+            const request = {
+                params: { id: '1'},
+                payload: { invalidKey: true, alsoInvalid: false, name: 'valid' }
+            };
+
+            const { update } = userRoutes({ userStore: dummyUserStore });
+            await update(request, reply);
+
+            demand(reply.callCount).equal(1);
+
+            const replyErr = reply.getCall(0).args[0];
+            demand(replyErr.isBoom).to.be.true();
+            demand(replyErr.output.statusCode).to.equal(400);
+            demand(replyErr.message).to.equal('invalid payload sent');
+            demand(replyErr.data.validationErrors).to.eql([
+                `attribute 'invalidKey' is not updatable by this method`,
+                `attribute 'alsoInvalid' is not updatable by this method`,
+            ]);
+        });
+
+        it(`should return an error if email address is already in use`, async () => {
+            const dummyUserStore = {
+                updateUserById: sinon.stub().returns(Promise.reject(new EmailExistsError('email already in use')))
+            };
+
+            const request = {
+                params: { id: '1'},
+                payload: { email: 'test-email' }
+            };
+
+            const { update } = userRoutes({ userStore: dummyUserStore });
+            await update(request, reply);
+
+            demand(reply.callCount).equal(1);
+
+            const replyErr = reply.getCall(0).args[0];
+            demand(replyErr.isBoom).to.be.true();
+            demand(replyErr.output.statusCode).to.equal(400);
+            demand(replyErr.message).to.equal('invalid payload sent');
+            demand(replyErr.data.validationErrors).to.eql([
+                'email already in use',
+            ]);
+
+            demand(dummyUserStore.updateUserById.callCount).equal(1);
+            demand(dummyUserStore.updateUserById.getCall(0).args).eql([1, request.payload]);
+        });
+
+        it(`should return the user if the user can be successfully created`, async () => {
+            const expectedUser = {
+                name: 'test'
+            };
+
+            const dummyUserStore = {
+                updateUserById: sinon.stub().returns(Promise.resolve(expectedUser))
+            };
+
+            const request = {
+                params: { id: '1'},
+                payload: { email: 'test-email' }
+            };
+
+            const { update } = userRoutes({ userStore: dummyUserStore });
+            await update(request, reply);
+
+            demand(reply.callCount).equal(1);
+            demand(reply.getCall(0).args).eql([expectedUser]);
+
+            demand(dummyUserStore.updateUserById.callCount).equal(1);
+            demand(dummyUserStore.updateUserById.getCall(0).args).eql([1, request.payload]);
+        });
+
+    });
+
 });
