@@ -1,6 +1,6 @@
 const demand = require('must');
 const sinon = require('sinon');
-const { UserExistsError } = require("../../../../src/stores/users");
+const { EmailExistsError } = require("../../../../src/stores/users");
 const { badRequest, notFound } = require('boom');
 
 const { route: userRoutes } = require('../../../../src/routes/users');
@@ -154,7 +154,7 @@ describe('routes/users', () => {
 
         it(`should return an error if email address is already in use`, async () => {
             const dummyUserStore = {
-                createUser: sinon.stub().returns(Promise.reject(new UserExistsError('email already in use')))
+                createUser: sinon.stub().returns(Promise.reject(new EmailExistsError('email already in use')))
             };
 
             const request = {

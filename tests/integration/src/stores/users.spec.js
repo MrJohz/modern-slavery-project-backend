@@ -3,7 +3,7 @@ require('../../../utils/must-user')(demand);
 
 const { compare } = require('bcrypt');
 
-const { UserKnexStore, UserExistsError } = require('../../../../src/stores/users');
+const { UserKnexStore, EmailExistsError } = require('../../../../src/stores/users');
 const { create } = require('../../../../src/knex');
 
 describe('stores/users', () => {
@@ -218,7 +218,7 @@ describe('stores/users', () => {
                     password: password,
                 });
 
-                const id = (await knex('users').select('id').where({name: 'admin'}).first()).id;
+                const id = (await knex('users').select('id').where({ name: 'admin' }).first()).id;
 
                 demand(user).to.be.User({
                     id,
@@ -231,7 +231,7 @@ describe('stores/users', () => {
 
                 demand(user).to.be.User(await store.getUserById(id));
 
-                const hashedPass = (await knex('users').select('password').where({name: 'admin'}).first()).password;
+                const hashedPass = (await knex('users').select('password').where({ name: 'admin' }).first()).password;
                 demand(await compare(password, hashedPass)).to.be.true();
             });
 
@@ -247,7 +247,7 @@ describe('stores/users', () => {
                     name: 'added',
                     email: 'test@test.com',
                     password: `my mother's maiden name is...`,
-                })).to.reject.to.error(UserExistsError, /email/);
+                })).to.reject.to.error(EmailExistsError, /email/);
             });
 
         });
@@ -270,7 +270,174 @@ describe('stores/users', () => {
                 demand(await store.deleteUserById(1)).to.be.false();
             });
 
-        })
+        });
+
+        describe('updateUserById', () => {
+
+            it('should fail if invalid parameters are passed in', async () => {
+                await demand(store.updateUserById(1, { id: 657576 })).to.reject.to.error(Error);
+
+                await demand(store.updateUserById(1, {
+                    administrates: []
+                })).to.reject.to.error(Error);
+
+                await demand(store.createUser({
+                    memberOf: []
+                })).to.reject.to.error(Error);
+            });
+
+            it(`should update the user's name if provided`, async () => {
+                await knex('users').insert({
+                    id: 1,
+                    name: 'admin',
+                    email: 'test@test.com',
+                    password: 'test',
+                    site_admin: false
+                });
+
+                const updated = await store.updateUserById(1, { name: 'not-admin' });
+
+                demand(updated).to.be.User({
+                    id: 1,
+                    name: 'not-admin',
+                    email: 'test@test.com',
+                    site_admin: false,
+                    memberOf: [],
+                    administrates: [],
+                });
+
+                demand(updated).to.be.User(await store.getUserById(1));
+
+                const databaseName = (await knex('users').select('name as data').where('id', 1).first()).data;
+                demand(databaseName).to.equal('not-admin');
+            });
+
+            it(`should update the user's email if provided`, async () => {
+                await knex('users').insert({
+                    id: 1,
+                    name: 'admin',
+                    email: 'test@test.com',
+                    password: 'test',
+                    site_admin: false
+                });
+
+                const updated = await store.updateUserById(1, { email: 'updated-email@test.com' });
+
+                demand(updated).to.be.User({
+                    id: 1,
+                    name: 'admin',
+                    email: 'updated-email@test.com',
+                    site_admin: false,
+                    memberOf: [],
+                    administrates: [],
+                });
+
+                demand(updated).to.be.User(await store.getUserById(1));
+
+                const databaseEmail = (await knex('users').select('email as data').where('id', 1).first()).data;
+                demand(databaseEmail).to.equal('updated-email@test.com');
+            });
+
+            it(`should update the user's email if provided when it is the same as the current email`, async () => {
+                await knex('users').insert({
+                    id: 1,
+                    name: 'admin',
+                    email: 'test@test.com',
+                    password: 'test',
+                    site_admin: false
+                });
+
+                const updated = await store.updateUserById(1, { email: 'test@test.com' });
+
+                demand(updated).to.be.User({
+                    id: 1,
+                    name: 'admin',
+                    email: 'test@test.com',
+                    site_admin: false,
+                    memberOf: [],
+                    administrates: [],
+                });
+
+                demand(updated).to.be.User(await store.getUserById(1));
+
+                const databaseEmail = (await knex('users').select('email as data').where('id', 1).first()).data;
+                demand(databaseEmail).to.equal('test@test.com');
+            });
+
+            it(`should update the user's admin privileges if provided`, async () => {
+                await knex('users').insert({
+                    id: 1,
+                    name: 'admin',
+                    email: 'test@test.com',
+                    password: 'test',
+                    site_admin: false
+                });
+
+                const updated = await store.updateUserById(1, { site_admin: true });
+
+                demand(updated).to.be.User({
+                    id: 1,
+                    name: 'admin',
+                    email: 'test@test.com',
+                    site_admin: true,
+                    memberOf: [],
+                    administrates: [],
+                });
+
+                demand(updated).to.be.User(await store.getUserById(1));
+
+                const databaseAdmin = !!(await knex('users').select('site_admin as data').where('id', 1).first()).data;
+                demand(databaseAdmin).to.equal(true);
+            });
+
+            it(`should update the user's password if provided and hash it correctly`, async () => {
+                await knex('users').insert({
+                    id: 1,
+                    name: 'admin',
+                    email: 'test@test.com',
+                    password: 'test',
+                    site_admin: false
+                });
+
+                const updated = await store.updateUserById(1, { password: 'brand new password' });
+
+                demand(updated).to.be.User({
+                    id: 1,
+                    name: 'admin',
+                    email: 'test@test.com',
+                    site_admin: false,
+                    memberOf: [],
+                    administrates: [],
+                });
+
+                demand(updated).to.be.User(await store.getUserById(1));
+
+                const databaseHash = (await knex('users').select('password as data').where('id', 1).first()).data;
+                demand(await compare('brand new password', databaseHash)).to.be.true();
+            });
+
+            it(`should throw an error if the user's email already exists`, async () => {
+                await knex('users').insert({
+                    id: 1,
+                    name: 'admin',
+                    email: 'test@test.com',
+                    password: 'test',
+                    site_admin: false
+                });
+
+                await knex('users').insert({
+                    name: 'originalAddressHolder',
+                    email: 'myfancymail@test.com',
+                    password: 'test',
+                    site_admin: false
+                });
+
+                await demand(store.updateUserById(1, {
+                    email: 'myfancymail@test.com',
+                })).to.reject.to.error(EmailExistsError, /email/);
+            });
+
+        });
 
     });
 

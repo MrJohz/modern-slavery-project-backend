@@ -5,7 +5,7 @@ const { hash } = require('bcrypt');
 
 const { security } = require('../environment');
 
-exports.UserExistsError = class UserExistsError extends ExtendableError {};
+exports.EmailExistsError = class UserExistsError extends ExtendableError {};
 exports.UserNotFoundError = class UserNotFoundError extends ExtendableError {};
 
 exports.UserKnexStore = class UserKnexStore {
@@ -96,7 +96,7 @@ exports.UserKnexStore = class UserKnexStore {
                 .first();
 
             if (existingUsers.count > 0) {
-                throw new exports.UserExistsError(`email already in use`);
+                throw new exports.EmailExistsError(`email already in use`);
             }
 
             const id = await this._knex('users')
@@ -123,21 +123,43 @@ exports.UserKnexStore = class UserKnexStore {
         return rows > 0;  // return true if a user was actually deleted
     }
 
-    async updateUserById(userId, updater, _trx) {
-        // TODO: huh, this is harder than I thought it would be - let's sleep on it!
+    async updateUserById(userId, attributes, _trx) {
+
+        if ('administrates' in attributes || 'memberOf' in attributes) {
+            throw new Error('cannot update groups using this method');
+        }
+
+        if ('id' in attributes) {
+            throw new Error('cannot update id');
+        }
 
         const operation = async trx => {
-            const originalUser = await this.getUserById(userId, trx);
+            // validate changes
+            if ('email' in attributes) {
+                const existingUsers = await this._knex('users')
+                    .transacting(trx)
+                    .where('email', attributes.email)
+                    .whereNot('id', userId)  // a user can update their own email to the same address if they want
+                    .count('* as count')
+                    .first();
 
-            // updater doesn't have to be async to work here, but it helps
-            // so await it anyway.  we're in an async function, it's
-            // basically free to do that (not a technically true statement)
-            const newUser = await updater(originalUser);
+                if (existingUsers.count > 0) {
+                    throw new exports.EmailExistsError(`email already in use`);
+                }
+            }
+
+            if ('password' in attributes) {
+                attributes.password = await hash(attributes.password, security.saltRounds);
+            }
 
             await this._knex('users')
                 .transacting(trx)
                 .where('id', userId)
-                .update(/* but how? */)
+                .update(attributes);
+
+            // we probably don't need to make another round DB trip to get the updated user, but
+            // this way is a lot easier than any other ways I can immediately think of
+            return this.getUserById(userId, trx);
         };
 
         if (_trx) {  // are we part of an existing transaction?  if so let's not open a new one

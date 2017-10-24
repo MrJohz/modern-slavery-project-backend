@@ -1,4 +1,4 @@
-const { UserExistsError } = require("../stores/users");
+const { EmailExistsError } = require("../stores/users");
 const { badRequest, notFound } = require('boom');
 
 module.exports.route = ({ userStore }) => {
@@ -45,7 +45,7 @@ module.exports.route = ({ userStore }) => {
         try {
             user = await userStore.createUser(request.payload);
         } catch (e) {
-            if (e instanceof UserExistsError) {
+            if (e instanceof EmailExistsError) {
                 validationErrors.push(`email already in use`);
             } else {
                 throw e;
