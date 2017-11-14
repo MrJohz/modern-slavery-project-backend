@@ -16,8 +16,9 @@ exports.up = async function (knex) {
     await knex.schema.createTable('group_users', table => {
         table.integer('user').references('id').inTable('users');
         table.integer('group').references('group').inTable('groups');
-        table.primary('user', 'group');
         table.boolean('group_admin');
+
+        table.primary('user', 'group');
     })
 };
 

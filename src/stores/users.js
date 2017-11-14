@@ -9,6 +9,7 @@ exports.EmailExistsError = class UserExistsError extends ExtendableError {};
 exports.UserNotFoundError = class UserNotFoundError extends ExtendableError {};
 
 exports.UserKnexStore = class UserKnexStore {
+
     constructor(knex) {
         this._knex = knex;
     }
@@ -85,7 +86,7 @@ exports.UserKnexStore = class UserKnexStore {
             name: required(user, 'name'),
             email: required(user, 'email'),
             password: await hash(required(user, 'password'), security.saltRounds),
-            site_admin: false,
+            site_admin: user['siteAdmin'] || false,
         };
 
         const operation = async trx => {
