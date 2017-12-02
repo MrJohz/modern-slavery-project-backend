@@ -5,6 +5,7 @@ const { create } = require('./knex');
 const { UserKnexStore } = require('./stores/users');
 const { GroupKnexStore } = require('./stores/groups');
 const { ProcedureStore } = require('./stores/procedures');
+const { LanguageStore } = require('./stores/languages');
 
 const knex = create();
 
@@ -58,12 +59,14 @@ server.register({
         context: {
             userStore: new UserKnexStore(knex),
             groupStore: new GroupKnexStore(knex),
-            procedureStore: new ProcedureStore(),
+            procedureStore: new ProcedureStore(knex),
+            languageStore: new LanguageStore(knex),
         },
         routes: [
             { mount: '/users', use: require('./routes/users') },
             { mount: '/groups', use: require('./routes/groups') },
             { mount: '/procedures', use: require('./routes/procedures') },
+            { mount: '/languages', use: require('./routes/languages') },
         ]
     }
 }, err => {
