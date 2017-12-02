@@ -4,6 +4,7 @@ const { DEBUG } = require('./environment');
 const { create } = require('./knex');
 const { UserKnexStore } = require('./stores/users');
 const { GroupKnexStore } = require('./stores/groups');
+const { ProcedureStore } = require('./stores/procedures');
 
 const knex = create();
 
@@ -12,7 +13,8 @@ server.connection({
     port: 3000,
     host: 'localhost',
     routes: {
-        json: DEBUG ? { space: 4 } : null
+        cors: true,
+        json: DEBUG ? { space: 4 } : null,
     }
 });
 
@@ -56,10 +58,12 @@ server.register({
         context: {
             userStore: new UserKnexStore(knex),
             groupStore: new GroupKnexStore(knex),
+            procedureStore: new ProcedureStore(),
         },
         routes: [
             { mount: '/users', use: require('./routes/users') },
-            { mount: '/groups', use: require('./routes/groups') }
+            { mount: '/groups', use: require('./routes/groups') },
+            { mount: '/procedures', use: require('./routes/procedures') },
         ]
     }
 }, err => {
