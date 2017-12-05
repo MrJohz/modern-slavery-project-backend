@@ -7,7 +7,10 @@ module.exports.route = ({ procedureStore }) => {
             return reply(badRequest(`could not coerce '${request.params.id}' to int`));
         }
 
-        reply(await procedureStore.getProcedureById(request.params.id));
+        const id = parseInt(request.params.id, 10);
+        const language = parseInt(request.query.language, 10);
+
+        reply(await procedureStore.getProcedureById(id, language));
     };
 
     return { fetchOne };

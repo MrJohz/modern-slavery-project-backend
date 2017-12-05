@@ -42,7 +42,7 @@ exports.ProcedureStore = class ProcedureStore {
 
                     const question = { question: answers[0].question, answers: [], kind: kindName };
                     for (const answer of answers) {
-                        if (!result[answer.link]) {  // this link hasn't been followed yet
+                        if (answer.link && !result[answer.link]) {  // this link hasn't been followed yet
                             toView.push(answer.link);
                         }
 
@@ -54,9 +54,12 @@ exports.ProcedureStore = class ProcedureStore {
                     const advice = await this._knex('advices')
                         .transacting(trx)
                         .where({ id, kind })
-                        .select('english_text as forUser', 'facilitator_advice as forFacilitator')
+                        .select('english_text as forUser', 'facilitator_advice as forFacilitator', 'next_step as link')
                         .first();
                     advice.kind = kindName;
+                    if (advice.link && !result[advice.link]) {
+                        toView.push(advice.link);
+                    }
 
                     result[viewId] = advice;
                 }

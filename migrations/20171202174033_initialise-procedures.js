@@ -3,8 +3,11 @@ exports.up = async function (knex) {
         table.increments('id');
         table.string('english_name');
         table.string('name');
-        table.string('welcome');
         table.string('flags');  // comma separated values
+        table.text('lang_selection');
+        table.text('introduction');
+        table.text('safe');
+        table.text('unsafe');
     });
 
     await knex.schema.createTable('procedures', table => {
@@ -74,6 +77,7 @@ exports.up = async function (knex) {
 
         table.string('english_text');
         table.string('facilitator_advice');
+        table.integer('next_step').references('id').inTable('steps');
         table.integer('procedure').references('id').inTable('procedures');
     });
 
