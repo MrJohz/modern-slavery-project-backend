@@ -34,10 +34,16 @@ exports.ProcedureStore = class ProcedureStore {
                 if (kindName === 'question') {
                     const answers = await this._knex('questions')
                         .transacting(trx)
-                        .where({ 'questions.id': id, 'questions.kind': kind })
+                        .leftJoin('question_texts', 'questions.id', '=', 'question_texts.question')
                         .leftJoin('answers', 'questions.id', '=', 'answers.answer_to')
-                        .select('questions.english_text as question',
-                            'answers.english_text as answer',
+                        .leftJoin('answer_texts', 'answers.id', '=', 'answer_texts.answer')
+                        .where({
+                            'questions.id': id, 'questions.kind': kind,
+                            'question_texts.language': language,
+                            'answer_texts.language': language,
+                        })
+                        .select('question_texts.text as question',
+                            'answer_texts.text as answer',
                             'answers.next_step as link');
 
                     const question = { question: answers[0].question, answers: [], kind: kindName };
@@ -53,9 +59,18 @@ exports.ProcedureStore = class ProcedureStore {
                 } else {
                     const advice = await this._knex('advices')
                         .transacting(trx)
-                        .where({ id, kind })
-                        .select('english_text as forUser', 'facilitator_advice as forFacilitator', 'next_step as link')
+                        .leftJoin('advice_texts', 'advices.id', '=', 'advice_texts.advice')
+                        .where({'advices.id': id, 'advices.kind': kind})
+                        .andWhere(q =>
+                            q.whereNull('advices.english_text')
+                                .orWhere('advice_texts.language', language)
+                        )
+                        .select('advice_texts.text as forUser',
+                            'advices.facilitator_advice as forFacilitator',
+                            'advices.next_step as link')
                         .first();
+
+                    console.log(advice);
                     advice.kind = kindName;
                     if (advice.link && !result[advice.link]) {
                         toView.push(advice.link);
