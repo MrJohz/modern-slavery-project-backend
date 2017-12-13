@@ -133,7 +133,7 @@ exports.seed = async function (knex) {
         id: 1,
         kind: 'question',
         question: 'Do you have a job?',
-        french: 'Avez-vous un travail?',
+        french: 'Avez-vous un travail\xa0?',
         hungarian: 'Van állása?',
         answers: [{
             answer: 'Yes',
@@ -157,7 +157,7 @@ exports.seed = async function (knex) {
         id: 2,
         kind: 'question',
         question: 'Does someone ask you to do things for them, and you are expected to do it?',
-        french: 'Quelqu’un vous a-t-il déjà demandé de faire quelque chose, attendant de votre part que vous l’exécutiez sans question?',
+        french: 'Quelqu’un vous a-t-il déjà demandé de faire quelque chose, attendant de votre part que vous l’exécutiez sans question\xa0?',
         hungarian: 'Van valaki aki megbízza önt feladatokkal/kioszt önnek tennivalókat?',
         answers: [{
             answer: 'Yes',
@@ -176,7 +176,7 @@ exports.seed = async function (knex) {
         id: 3,
         kind: 'question',
         question: 'Are you paid to do this work?',
-        french: 'Êtes-vous payé pour faire ce travail?',
+        french: 'Êtes-vous payé pour faire ce travail\xa0?',
         hungarian: 'És ezért kap fizetést?',
         answers: [{
             answer: 'Yes',
@@ -205,7 +205,7 @@ exports.seed = async function (knex) {
         id: 4,
         kind: 'question',
         question: 'Could you stop doing this work if you wanted to?',
-        french: 'Pourriez-vous arrêter de faire ce travail si vous le souhaitiez?',
+        french: 'Pourriez-vous arrêter de faire ce travail si vous le souhaitiez\xa0?',
         hungarian: 'Abba hagyhatná ezt a munkát ha szeretné?',
         answers: [{
             answer: 'Yes',
@@ -239,7 +239,7 @@ exports.seed = async function (knex) {
         id: 5,
         kind: 'question',
         question: 'Are you able to come and go as you please from the place where you live?',
-        french: 'Êtes-vous libre d’aller et venir de votre domicile comme vous le souhaitez?',
+        french: 'Êtes-vous libre d’aller et venir de votre domicile comme vous le souhaitez\xa0?',
         hungarian: 'Szabadon járhat el a lakóhelyéről?',
         answers: [{
             answer: 'Yes',
@@ -258,7 +258,7 @@ exports.seed = async function (knex) {
         id: 6,
         kind: 'question',
         question: 'Do you have to ask permission to eat, sleep, or go to the bathroom?',
-        french: 'Devez-vous demander la permission pour manger, dormir ou aller aux toilettes?',
+        french: 'Devez-vous demander la permission pour manger, dormir ou aller aux toilettes\xa0?',
         hungarian: 'Van valaki akitől engedélyt kell kérnie hogy ehessen, aludhasson, vagy mosdóba mehessen?',
         answers: [{
             answer: 'Yes',
@@ -277,7 +277,7 @@ exports.seed = async function (knex) {
         id: 7,
         kind: 'question',
         question: 'Are there locks on your doors/windows so you cannot get out?',
-        french: 'Y a-t-il des verrous sur vos portes/fenêtres pour vous empêcher de sortir?',
+        french: 'Y a-t-il des verrous sur vos portes/fenêtres pour vous empêcher de sortir\xa0?',
         hungarian: 'Vannak zárak az ajtón vagy az ablakokon a lakóhelyén, amit nem tud kinyitni? Vagy amik akadályozzák hogy ki vay bejusson?',
         answers: [{
             answer: 'Yes',
@@ -306,7 +306,7 @@ exports.seed = async function (knex) {
         id: 8,
         kind: 'question',
         question: 'Have you or your family been threatened in order to make you do something?',
-        french: 'Avez-vous, ou un membre de votre famille, été menacé pour vous forcer à faire quelque chose?',
+        french: 'Avez-vous, ou un membre de votre famille, été menacé pour vous forcer à faire quelque chose\xa0?',
         hungarian: 'Fenyegették önt vagy családját azért hogy önt valamire kényszerítsék?',
         answers: [{
             answer: 'Yes',
@@ -335,7 +335,7 @@ exports.seed = async function (knex) {
         id: 9,
         kind: 'question',
         question: 'Has your identification or documentation been taken away from you?',
-        french: 'Vos papiers d’identité ou documents personnels vous ont-ils été retirés?',
+        french: 'Vos papiers d’identité ou documents personnels vous ont-ils été retirés\xa0?',
         hungarian: 'Elvetettek öntől bármilyen igazolványt, útlevelet, személyit?',
         answers: [{
             answer: 'Yes',
@@ -364,7 +364,7 @@ exports.seed = async function (knex) {
         id: 10,
         kind: 'question',
         question: 'How old are you?',
-        french: 'Quel âge avez-vous?',
+        french: 'Quel âge avez-vous\xa0?',
         hungarian: 'Hány éves?',
         answers: [{
             answer: 'Under 18',
