@@ -42,17 +42,26 @@ exports.ProcedureStore = class ProcedureStore {
                             'question_texts.language': language,
                             'answer_texts.language': language,
                         })
-                        .select('question_texts.text as question',
+                        .select(
+                            'question_texts.text as question',
                             'answer_texts.text as answer',
+                            'answers.id as id',
                             'answers.next_step as link');
 
-                    const question = { question: answers[0].question, answers: [], kind: kindName };
+                    const question = {
+                        id, question: answers[0].question,
+                        answers: [], kind: kindName
+                    };
                     for (const answer of answers) {
                         if (answer.link && !result[answer.link]) {  // this link hasn't been followed yet
                             toView.push(answer.link);
                         }
 
-                        question.answers.push({ answer: answer.answer, link: answer.link });
+                        question.answers.push({
+                            id: answer.id,
+                            answer: answer.answer,
+                            link: answer.link
+                        });
                     }
 
                     result[viewId] = question;
@@ -60,17 +69,18 @@ exports.ProcedureStore = class ProcedureStore {
                     const advice = await this._knex('advices')
                         .transacting(trx)
                         .leftJoin('advice_texts', 'advices.id', '=', 'advice_texts.advice')
-                        .where({'advices.id': id, 'advices.kind': kind})
+                        .where({ 'advices.id': id, 'advices.kind': kind })
                         .andWhere(q =>
                             q.whereNull('advices.english_text')
                                 .orWhere('advice_texts.language', language)
                         )
-                        .select('advice_texts.text as forUser',
+                        .select(
+                            'advices.id as id',
+                            'advice_texts.text as forUser',
                             'advices.facilitator_advice as forFacilitator',
                             'advices.next_step as link')
                         .first();
 
-                    console.log(advice);
                     advice.kind = kindName;
                     if (advice.link && !result[advice.link]) {
                         toView.push(advice.link);
