@@ -1,3 +1,5 @@
+const { compare } = require('bcrypt');
+
 const { ExtendableError } = require("../models/errors");
 const { User } = require('../models/users');
 const { required } = require('../models/utils');
@@ -6,6 +8,7 @@ const { utilities } = require('../environment');
 
 exports.EmailExistsError = class UserExistsError extends ExtendableError {};
 exports.UserNotFoundError = class UserNotFoundError extends ExtendableError {};
+exports.InvalidCredentialsError = class InvalidCredentialsError extends ExtendableError {};
 
 exports.UserKnexStore = class UserKnexStore {
 
@@ -78,6 +81,28 @@ exports.UserKnexStore = class UserKnexStore {
         }
 
         return users;
+    }
+
+    async validateUser(email, password, _trx) {
+        const user = await this._getTableWithTransaction('users', _trx)
+            .where('email', email)
+            .select('id', 'password as hash')
+            .first();
+
+        // the slightly weird overly-defensive programming here
+        // is to try and produce a validation process that takes
+        // roughly the same amount of time, regardless of whether
+        // the user exists in the database or not.
+        //
+        // this could be cargo cult programming...
+        const hash = (user || {}).hash || '';
+        const id = (user || {}).id;
+
+        if (await compare(password, hash)) {
+            return id;
+        } else {
+            return null;
+        }
     }
 
     async createUser(user, _trx) {
