@@ -1,9 +1,8 @@
 const { ExtendableError } = require("../models/errors");
 const { User } = require('../models/users');
 const { required } = require('../models/utils');
-const { hash } = require('bcrypt');
 
-const { security } = require('../environment');
+const { utilities } = require('../environment');
 
 exports.EmailExistsError = class UserExistsError extends ExtendableError {};
 exports.UserNotFoundError = class UserNotFoundError extends ExtendableError {};
@@ -85,7 +84,7 @@ exports.UserKnexStore = class UserKnexStore {
         const userToInsert = {
             name: required(user, 'name'),
             email: required(user, 'email'),
-            password: await hash(required(user, 'password'), security.saltRounds),
+            password: await utilities.hash(required(user, 'password')),
             site_admin: user['siteAdmin'] || false,
         };
 
@@ -150,7 +149,7 @@ exports.UserKnexStore = class UserKnexStore {
             }
 
             if ('password' in attributes) {
-                attributes.password = await hash(attributes.password, security.saltRounds);
+                attributes.password = await utilities.hash(attributes.password);
             }
 
             await this._knex('users')

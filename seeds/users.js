@@ -1,9 +1,11 @@
+const { utilities } = require('../src/environment');
+
 const USERS = [
     {
         id: 1,
         name: 'admin',
         email: 'test@test.com',
-        password: 'fb8e16a454dfce1e8824550e7022d37de2e634f7624b8383f4a39ec75df7249b',
+        password: 'admin',
         site_admin: true
     },
     {
@@ -17,49 +19,49 @@ const USERS = [
         id: 3,
         name: 'xXx_RAWSTEEL_xXx',
         email: 'asmalcombe0@ask.com',
-        password: '6430c8a6c9676490497b35ad7e21d5b2d394602192aed43fbbf06a523f2830be',
+        password: 'i-am-the-best',
         site_admin: false
     },
     {
         id: 4,
         name: 'Jonas',
         email: 'jburde1@examiner.com',
-        password: 'fb8e16a454dfce1e8824550e7022d37de2e634f7624b8383f4a39ec75df7249b',
+        password: 'Brothers',
         site_admin: false
     },
     {
         id: 5,
         name: 'Yusinda Force',
         email: 'xforce2@boston.com',
-        password: 'd71aebfce02cecf1f31cc061a68a8c51c2788ba37504e648b8977121d40cefe5',
+        password: 'yo da man13$$',
         site_admin: false
     },
     {
         id: 6,
         name: 'Kristøs Bâudinet',
         email: 'kbaudinet3@is.gd',
-        password: 'e522cce22f3c004c7a4e419e63f983775f37828577a30017e1145c4611784cfa',
+        password: `already this is a fairly long password string, but then I'll repeat it a few million times just to be irritating`.repeat(1e6),
         site_admin: false
     },
     {
         id: 7,
         name: 'Nata Penny',
         email: 'nsamworth4@mac.com',
-        password: '4d2d05cdcfecba50d394dccf16f463b9bd241ecbdc176e794caedc44d64a910b',
+        password: 'stingy',
         site_admin: false
     },
     {
         id: 8,
         name: '孫德明',
         email: 'erufwa@mac.com',
-        password: 'e7bd05cdcfecba50d394dccf16f463b9bd241ecbdc176e794caedc44d64a910b',
+        password: '获取该Unicode，杀死该Unicode',
         site_admin: false
     },
     {
         id: 9,
         name: 'Lucy Loner',
         email: 'lucl@ukas.com',
-        password: '3f6d05cdcfecba50d394dccf16f469b9ddb41ecbdc176e794caedc44d64a910b',
+        password: '     ',
         site_admin: false
     },
 ];
@@ -77,6 +79,7 @@ exports.seed = async function (knex) {
     await knex('group_users').delete();
 
     for (const user of USERS) {
+        user.password = await utilities.hash(user.password);
         await knex('users').insert(user);
     }
 
