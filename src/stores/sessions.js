@@ -62,7 +62,9 @@ exports.SessionStore = class SessionStore extends AbstractKnexStore {
     async refreshSession(sessionID, _trx) {
         return await this.beginTransaction(_trx, async trx => {
             const session = await this.getSession(sessionID, trx);
-            if (session.needs_revalidation) {
+            if (session == null) {
+                throw new exports.SessionNotFound(`session with id ${sessionID} cannot be found`);
+            } else if (session.needs_revalidation) {
                 throw new exports.RevalidationError(`session cannot be refreshed without validation`);
             } else if (moment(session.expires_at).isBefore(moment())) {
                 throw new exports.OutOfDateError(`session has already expired, please revalidate`);
@@ -88,7 +90,9 @@ exports.SessionStore = class SessionStore extends AbstractKnexStore {
 
             const session = await this.getSession(sessionID, trx);
 
-            if (moment(session.expires_at).isBefore(moment())) {
+            if (session == null) {
+                throw new exports.SessionNotFound(`session with id ${sessionID} cannot be found`);
+            } else if (moment(session.expires_at).isBefore(moment())) {
                 throw new exports.OutOfDateError(`session has already expired, please revalidate`);
             }
 
@@ -108,9 +112,7 @@ exports.SessionStore = class SessionStore extends AbstractKnexStore {
             .where('id', sessionID)
             .delete();
 
-        if (results < 1) {
-            throw new exports.SessionNotFound(`session with id ${sessionID} not found`);
-        }
+        return results > 0;
     }
 
     async removeAllSessions(userID, _trx) {

@@ -164,6 +164,11 @@ describe('stores/sessions', () => {
                 demand(newSession.needs_revalidation).to.be.false();
             });
 
+            it('should throw an error if the session does not exist', async () => {
+                await demand(sessionStore.refreshSession('does not exist'))
+                    .to.reject.to.error(SessionNotFound);
+            });
+
             it('should throw an error if the session is out of date', async () => {
                 const jonas = await userStore.createUser({
                     name: 'Jonas',
@@ -317,9 +322,8 @@ describe('stores/sessions', () => {
                 demand(await sessionStore.getSession(session.id)).to.be.null();
             });
 
-            it('should throw if session does not exist', async () => {
-                await demand(sessionStore.removeSession('non existent'))
-                    .to.reject.to.error(SessionNotFound, /non existent/);
+            it('should return false if session does not exist', async () => {
+                demand(await sessionStore.removeSession('non existent')).to.be.false();
             });
         });
 
