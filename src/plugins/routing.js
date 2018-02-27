@@ -61,6 +61,17 @@ exports.register = function Router(server, options, next) {
                 }
             });
         }
+
+        if ('removeAll' in handlers) {
+            server.route({
+                method: 'DELETE',
+                path: mount ? `${mount}` : '/',  // special case for mount point being '/'
+                config: {
+                    response: { emptyStatusCode: 204 },
+                    handler: handlers['removeAll'],
+                }
+            })
+        }
     }
 
     next();

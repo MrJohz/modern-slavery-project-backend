@@ -74,6 +74,15 @@ module.exports.route = ({ sessionStore }) => {
             : reply(notFound(`could not find session ${request.params.id}`));
     };
 
+    const removeAll = async (request, reply) => {
+        if (!/^\d+$/.test(request.query.user)) {
+            return reply(badRequest(`could not coerce '${request.query.user}' to int`));
+        }
+
+        await sessionStore.removeAllSessions(parseInt(request.query.user, 10));
+        return reply();
+    };
+
     // refresh session - either use only session ID, or provide username/password as well
     const update = async (request, reply) => {
         if (!UUID_REGEX.test(request.params.id)) {
@@ -131,5 +140,5 @@ module.exports.route = ({ sessionStore }) => {
 
     };
 
-    return { fetchOne, create, remove, update };
+    return { fetchOne, create, remove, removeAll, update };
 };
