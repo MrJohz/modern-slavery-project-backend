@@ -6,6 +6,7 @@ const moment = require('moment');
 const { UserKnexStore, InvalidCredentialsError } = require('../../../../src/stores/users');
 const { SessionStore, OutOfDateError, RevalidationError, SessionNotFound } = require('../../../../src/stores/sessions');
 const { create } = require('../../../../src/knex');
+const { security } = require('../../../../src/environment');
 
 function nowish() {
     const now = moment();
@@ -57,8 +58,8 @@ describe('stores/sessions', () => {
                     '[this is not a password]');
 
                 demand(session.expires_at.getTime()).to.be.between(
-                    nowish().start.add(8, 'hours').valueOf(),
-                    nowish().end.add(8, 'hours').valueOf());
+                    nowish().start.add(security.sessionTimeout, 'hours').valueOf(),
+                    nowish().end.add(security.sessionTimeout, 'hours').valueOf());
 
                 demand(session.needs_revalidation).to.be.false();
 
@@ -139,7 +140,7 @@ describe('stores/sessions', () => {
                     site_admin: false,
                 });
 
-                const sessionId = '123e4567-e89b-12d3-a456-426655440000';
+                const sessionId = '123e4567-esecurity.sessionTimeout9b-12d3-a456-426655440000';
 
                 await knex('sessions').insert({
                     id: sessionId,
@@ -152,12 +153,12 @@ describe('stores/sessions', () => {
 
                 const { expires_at } = await knex('sessions').where('id', sessionId).first();
                 demand(expires_at).to.be.between(
-                    nowish().start.add(8, 'hours'),
-                    nowish().end.add(8, 'hours'));
+                    nowish().start.add(security.sessionTimeout, 'hours'),
+                    nowish().end.add(security.sessionTimeout, 'hours'));
 
                 demand(newSession.expires_at).to.be.between(
-                    nowish().start.add(8, 'hours'),
-                    nowish().end.add(8, 'hours'));
+                    nowish().start.add(security.sessionTimeout, 'hours'),
+                    nowish().end.add(security.sessionTimeout, 'hours'));
 
                 demand(newSession.id).to.equal(sessionId);
                 demand(newSession.user).to.be.User(jonas);
@@ -177,7 +178,7 @@ describe('stores/sessions', () => {
                     site_admin: false,
                 });
 
-                const sessionId = '123e4567-e89b-12d3-a456-426655440000';
+                const sessionId = '123e4567-esecurity.sessionTimeout9b-12d3-a456-426655440000';
 
                 await knex('sessions').insert({
                     id: sessionId,
@@ -198,7 +199,7 @@ describe('stores/sessions', () => {
                     site_admin: false,
                 });
 
-                const sessionId = '123e4567-e89b-12d3-a456-426655440000';
+                const sessionId = '123e4567-esecurity.sessionTimeout9b-12d3-a456-426655440000';
 
                 await knex('sessions').insert({
                     id: sessionId,
@@ -221,7 +222,7 @@ describe('stores/sessions', () => {
                     site_admin: false,
                 });
 
-                const sessionId = '123e4567-e89b-12d3-a456-426655440000';
+                const sessionId = '123e4567-esecurity.sessionTimeout9b-12d3-a456-426655440000';
 
                 await knex('sessions').insert({
                     id: sessionId,
@@ -235,12 +236,12 @@ describe('stores/sessions', () => {
 
                 const { expires_at } = await knex('sessions').where('id', sessionId).first();
                 demand(expires_at).to.be.between(
-                    nowish().start.add(8, 'hours'),
-                    nowish().end.add(8, 'hours'));
+                    nowish().start.add(security.sessionTimeout, 'hours'),
+                    nowish().end.add(security.sessionTimeout, 'hours'));
 
                 demand(newSession.expires_at).to.be.between(
-                    nowish().start.add(8, 'hours'),
-                    nowish().end.add(8, 'hours'));
+                    nowish().start.add(security.sessionTimeout, 'hours'),
+                    nowish().end.add(security.sessionTimeout, 'hours'));
 
                 demand(newSession.id).to.equal(sessionId);
                 demand(newSession.user).to.be.User(jonas);
@@ -255,7 +256,7 @@ describe('stores/sessions', () => {
                     site_admin: false,
                 });
 
-                const sessionId = '123e4567-e89b-12d3-a456-426655440000';
+                const sessionId = '123e4567-esecurity.sessionTimeout9b-12d3-a456-426655440000';
 
                 await knex('sessions').insert({
                     id: sessionId,
@@ -277,7 +278,7 @@ describe('stores/sessions', () => {
                     site_admin: false,
                 });
 
-                const sessionId = '123e4567-e89b-12d3-a456-426655440000';
+                const sessionId = '123e4567-esecurity.sessionTimeout9b-12d3-a456-426655440000';
 
                 await knex('sessions').insert({
                     id: sessionId,
@@ -291,12 +292,12 @@ describe('stores/sessions', () => {
 
                 const { expires_at } = await knex('sessions').where('id', sessionId).first();
                 demand(expires_at).to.be.between(
-                    nowish().start.add(8, 'hours'),
-                    nowish().end.add(8, 'hours'));
+                    nowish().start.add(security.sessionTimeout, 'hours'),
+                    nowish().end.add(security.sessionTimeout, 'hours'));
 
                 demand(newSession.expires_at).to.be.between(
-                    nowish().start.add(8, 'hours'),
-                    nowish().end.add(8, 'hours'));
+                    nowish().start.add(security.sessionTimeout, 'hours'),
+                    nowish().end.add(security.sessionTimeout, 'hours'));
 
                 demand(newSession.id).to.equal(sessionId);
                 demand(newSession.user).to.be.User(jonas);
@@ -336,7 +337,7 @@ describe('stores/sessions', () => {
                     site_admin: false,
                 });
 
-                const sessions = await Promise.all(Array.from({length: 2})
+                const sessions = await Promise.all(Array.from({ length: 2 })
                     .map(() => sessionStore.createSession('jburde1@examiner.com', '[this is not a password]')));
 
                 await sessionStore.removeAllSessions(jonas.id);

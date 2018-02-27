@@ -4,6 +4,7 @@ const moment = require('moment');
 const { ExtendableError } = require("../models/errors");
 const { AbstractKnexStore } = require("./abstract_store");
 const { UserKnexStore, InvalidCredentialsError } = require("./users");
+const { security } = require('../environment');
 
 exports.RevalidationError = class RevalidationError extends ExtendableError {};
 exports.OutOfDateError = class OutOfDateError extends ExtendableError {};
@@ -26,7 +27,7 @@ exports.SessionStore = class SessionStore extends AbstractKnexStore {
 
             const session = {
                 user: userId, id: uuid(),
-                expires_at: moment().add(8, 'hours').toDate(),
+                expires_at: moment().add(security.sessionTimeout, 'hours').toDate(),
                 needs_revalidation: false,
             };
 
@@ -70,7 +71,7 @@ exports.SessionStore = class SessionStore extends AbstractKnexStore {
                 throw new exports.OutOfDateError(`session has already expired, please revalidate`);
             }
 
-            session.expires_at = moment().add(8, 'hours').toDate();
+            session.expires_at = moment().add(security.sessionTimeout, 'hours').toDate();
 
             await this.getTableWithTransaction('sessions', trx)
                 .where('id', sessionID)
@@ -96,7 +97,7 @@ exports.SessionStore = class SessionStore extends AbstractKnexStore {
                 throw new exports.OutOfDateError(`session has already expired, please revalidate`);
             }
 
-            session.expires_at = moment().add(8, 'hours').toDate();
+            session.expires_at = moment().add(security.sessionTimeout, 'hours').toDate();
             session.needs_revalidation = false;
 
             await this.getTableWithTransaction('sessions', trx)
