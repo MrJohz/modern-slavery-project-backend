@@ -4,9 +4,9 @@ exports.ResultStore = class ResultStore {
         this._knex = knex;
     }
 
-    async insertResult(response) {
+    async insertResult(user, language, response) {
         await this._knex('results')
-            .insert({ response: JSON.stringify(response) });
+            .insert({ user, language, response: JSON.stringify(response) });
     }
 
 };

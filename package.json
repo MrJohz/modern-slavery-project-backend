@@ -16,6 +16,7 @@
     "good-console": "^6.4.0",
     "good-squeeze": "^5.0.2",
     "hapi": "^16.6.2",
+    "hapi-cors": "^1.0.1",
     "knex": "^0.13.0",
     "moment": "^2.20.1",
     "objection": "^0.8.9",

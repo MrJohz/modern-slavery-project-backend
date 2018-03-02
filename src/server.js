@@ -22,6 +22,19 @@ server.connection({
 });
 
 server.register({
+    register: require('hapi-cors'),
+    options: {
+        origins: ['*'],
+        headers: ['Accept', 'Content-Type', 'Authorization', 'Session'],
+    }
+}, err => {
+    if (!err) return;
+
+    console.error('Failed to load cors:', err);
+    throw err;
+});
+
+server.register({
     register: require('good'),
     options: {
         reporters: {

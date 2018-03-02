@@ -41,6 +41,17 @@ exports.SessionStore = class SessionStore extends AbstractKnexStore {
         return await this.beginTransaction(_trx, operation);
     }
 
+    async validateSession(sessionID, _trx) {
+        if (!sessionID) return false;
+
+        const session = await this.getSession(sessionID, _trx);
+
+        if (!session) return false;
+        if (moment(session.expires_at).isBefore(moment())) return false;
+
+        return session;
+    }
+
     async getSession(sessionID, _trx) {
         return await this.beginTransaction(_trx, async trx => {
             const session = await this.getTableWithTransaction('sessions', trx)

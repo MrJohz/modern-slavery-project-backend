@@ -840,6 +840,12 @@ handlebars@^4.0.3:
   optionalDependencies:
     uglify-js "^2.6"
 
+hapi-cors@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/hapi-cors/-/hapi-cors-1.0.1.tgz#ecb636524bcea7b6cbd457cb7a2434f58127cca9"
+  dependencies:
+    joi "^7.0.1"
+
 hapi@^16.6.2:
   version "16.6.2"
   resolved "https://registry.yarnpkg.com/hapi/-/hapi-16.6.2.tgz#690554fc9c5ca7ad2f8030bbfe21d5e5886cdc14"
@@ -936,6 +942,10 @@ heavy@^4.0.4:
 hoek@2.x.x:
   version "2.16.3"
   resolved "https://registry.yarnpkg.com/hoek/-/hoek-2.16.3.tgz#20bb7403d3cea398e91dc4710a8ff1b8274a25ed"
+
+hoek@3.x.x:
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/hoek/-/hoek-3.0.4.tgz#268adff66bb6695c69b4789a88b1e0847c3f3123"
 
 hoek@4.x.x, hoek@^4.2.0:
   version "4.2.0"
@@ -1213,6 +1223,15 @@ joi@^11.1.0:
   dependencies:
     hoek "4.x.x"
     isemail "3.x.x"
+    topo "2.x.x"
+
+joi@^7.0.1:
+  version "7.3.0"
+  resolved "https://registry.yarnpkg.com/joi/-/joi-7.3.0.tgz#4d9c9f181830444083665b5b6cd5b8ca6779a5e9"
+  dependencies:
+    hoek "3.x.x"
+    isemail "2.x.x"
+    moment "2.x.x"
     topo "2.x.x"
 
 js-combinatorics@^0.5.2:
