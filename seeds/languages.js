@@ -69,12 +69,12 @@ function helpersBuilder(knex) {
                 await knex('answer_texts').insert(answer_texts);
 
             } else {
-                const { forUser, forFacilitator, link, ...adviceLangs } = rest;
+                const { forUser, link, ...adviceLangs } = rest;
 
                 await knex('advices').insert({
                     id: stepId, kind: this.stepKind(kind),
                     english_text: forUser,
-                    facilitator_advice: forFacilitator,
+                    facilitator_advice: forUser,
                     next_step: link,
                     procedure: this.procedure('default'),
                 });
@@ -197,7 +197,6 @@ exports.seed = async function (knex) {
         forUser: 'You have the right to be paid for any work that you do.  If you are not being paid, there are people you can talk to.',
         french: 'Vous avez le droit d’être payé pour n’importe quel travail que vous réalisez. Si ce n’est pas le cas, vous pouvez vous tourner vers des professionnels qui sont là pour vous aider.',
         hungarian: 'Jogában áll fizetést kapni bármilyen munka elvégzésére. Ha önt nem fizetik, van kihez forduljon segítségért.',
-        forFacilitator: '*TODO*',
         link: 4,
     });
 
@@ -231,7 +230,6 @@ exports.seed = async function (knex) {
         forUser: 'Coercion (forcing someone to do something against their will) is illegal.  If you believe you are being coerced, you can talk to people about this situation.',
         french: 'La coercition (forcer quelqu’un à faire quelque chose contre son gré) est illégale. Si vous pensez en être victime, vous pouvez le signaler aux services compétents.',
         hungarian: 'A kényszermunka (valakit bármilyen munka elvégzésére kényszerítése) törvény sértés. Ha önt fizetés nélküli munkára kényszerítik, van kihez forduljon segítségért.',
-        forFacilitator: '*TODO*',
         link: 5,
     });
 
@@ -298,7 +296,6 @@ exports.seed = async function (knex) {
         forUser: 'You should have permission to come and go as you please.  This includes being able to use the toilets, eat, and sleep freely, as well as being able to leave the house whenever you want.  If you are unable to leave the house, there are people you can talk to.',
         french: 'Vous devez être libre de vos mouvements. Cela inclut utiliser les toilettes, manger et dormir librement, aussi bien que de quitter votre domicile quand vous le souhaiter. Si vous n’êtes pas autorisé à quitter votre domicile, vous pouvez le signaler aux services compétents.',
         hungarian: 'Jogában áll jönni menni ahogyan szeretne. Ebbe bele tartozik a mosdó szabad használata, szabad éves, ivás, alvás, és a lakóhelye elhagyása engedély nélkül. Hogyha önt ezekben korlátozza bárki is, van kihez forduljon segítségért.',
-        forFacilitator: '*TODO*',
         link: 8,
     });
 
@@ -327,7 +324,6 @@ exports.seed = async function (knex) {
         forUser: 'Coercion (forcing someone to do something against their will) is illegal.  If you believe you are being coerced, you can talk to people about this situation.',
         french: 'La coercition (forcer quelqu’un à faire quelque chose contre son gré) est illégale. Si vous pensez en être victime, vous pouvez le signaler aux services compétents.',
         hungarian: 'A kényszermunka (valakit bármilyen munka elvégzésére kényszerítése) törvény sértés. Ha önt fizetés nélküli munkára kényszerítik, van kihez forduljon segítségért.',
-        forFacilitator: '*TODO*',
         link: 9,
     });
 
@@ -356,7 +352,6 @@ exports.seed = async function (knex) {
         forUser: 'It is against the law to take someone\'s documentation and identification away from them.  If this has happened, please talk to people about it.',
         french: 'Il est illégal de retirer à quelqu’un ses documents personnels et papiers d’identité. Si c’est votre cas, vous devez immédiatement en informer quelqu’un.',
         hungarian: 'Törvény ellenes valakitől elvenni a személyét igazoló dokumentumokat. Hogyha önnel ez történt, kérem szóljon valakinek erről.',
-        forFacilitator: '*TODO*',
         link: 10,
     });
 
@@ -383,7 +378,6 @@ exports.seed = async function (knex) {
         id: 16,
         kind: 'advice',
         forUser: null,
-        forFacilitator: 'This person is under 18',
         link: null,
     });
 };
