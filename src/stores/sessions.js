@@ -79,7 +79,7 @@ exports.SessionStore = class SessionStore extends AbstractKnexStore {
             } else if (session.needs_revalidation) {
                 throw new exports.RevalidationError(`session cannot be refreshed without validation`);
             } else if (moment(session.expires_at).isBefore(moment())) {
-                throw new exports.OutOfDateError(`session has already expired, please revalidate`);
+                throw new exports.OutOfDateError(`session has already expired, please login again`);
             }
 
             session.expires_at = moment().add(security.sessionTimeout, 'hours').toDate();
@@ -105,7 +105,7 @@ exports.SessionStore = class SessionStore extends AbstractKnexStore {
             if (session == null) {
                 throw new exports.SessionNotFound(`session with id ${sessionID} cannot be found`);
             } else if (moment(session.expires_at).isBefore(moment())) {
-                throw new exports.OutOfDateError(`session has already expired, please revalidate`);
+                throw new exports.OutOfDateError(`session has already expired, please login again`);
             }
 
             session.expires_at = moment().add(security.sessionTimeout, 'hours').toDate();
