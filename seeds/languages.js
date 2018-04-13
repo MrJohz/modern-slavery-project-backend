@@ -106,7 +106,7 @@ exports.seed = async function (knex) {
         lang_selection: `Üdvözlöm. Segiteni szeretnék. Kérem kattintson ide hogy tovább lépjen.`,
     }, {
         english_name: 'german', flags: 'de', name: 'Deutsch',
-        lang_selection: `Hallo, ich bin hier, um dir zu helfen. Bitte klicken Sie hier um fortzufahren.`,
+        lang_selection: `Hallo, ich bin hier um Ihnen zu helfen. Bitte klicken Sie hier um fortzufahren.`,
     }, {
         english_name: 'catalan', flags: 'es,ad', name: 'Català',
         lang_selection: `Hola, sóc aquí per ajudar-te. Feu clic aquí per continuar.`,
